@@ -3,49 +3,161 @@ package test;
 /**
  * Created by think on 17.05.17.
  */
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import main.model.Ocean;
-import main.model.Result;
+import main.model.Orientation;
 import main.model.StuffOnWater;
-import org.junit.jupiter.api.Test;
+import main.view.CommandLineInterface;
+
+import static org.junit.Assert.*;
+import java.util.*;
+import org.junit.*;
 
 public class MyTests {
 
+    private static Ocean ocean;
+    @BeforeClass
+    public static void onceExecutedBeforeAll() throws Exception {
+        ocean = new Ocean(5,5 );
+    }
+
+    @Ignore
     @Test
-    public void setOnOcean() {
-        Ocean ocean = new Ocean(7);
-        assertEquals(StuffOnWater.WATER, ocean.shootAt(3), "Water");
-        ocean.setOnOceanAt(2, StuffOnWater.AIRCRAFT_CARRIER);
-        assertEquals(StuffOnWater.WATER, ocean.shootAt(0), "Water");
-        assertEquals(StuffOnWater.WATER, ocean.shootAt(1), "Water");
-        assertEquals(StuffOnWater.AIRCRAFT_CARRIER, ocean.shootAt(2), "Air craft");
-        assertEquals(StuffOnWater.AIRCRAFT_CARRIER, ocean.shootAt(3), "Air craft");
-        assertEquals(StuffOnWater.AIRCRAFT_CARRIER, ocean.shootAt(4), "Air craft");
-        assertEquals(StuffOnWater.AIRCRAFT_CARRIER, ocean.shootAt(5), "Air craft");
-        assertEquals(StuffOnWater.WATER, ocean.shootAt(6), "Water");
+    public void acceptOnlyValidFieldsForOcean() throws Exception {
+        Ocean ocean = new Ocean(6,6);
     }
 
     @Test
-    public void findFreePosition() {
-        Ocean ocean = new Ocean(8);
-        ocean.setOnOceanAt(0, StuffOnWater.AIRCRAFT_CARRIER);
-        assertEquals(4, ocean.findFreePosition(StuffOnWater.CRUISER), "found place for ship");
-        ocean.setOnOceanAt(4, StuffOnWater.CRUISER);
-        assertEquals(StuffOnWater.CRUISER, ocean.shootAt(4), "Found cruser");
-        assertEquals(StuffOnWater.CRUISER, ocean.shootAt(5), "Found cruser");
-        assertEquals(StuffOnWater.CRUISER, ocean.shootAt(6), "Found cruser");
-        assertEquals(StuffOnWater.WATER, ocean.shootAt(7), "Water");
+    public void setDestroyer() {
 
+        ocean.setOnOceanAt(0,0, Orientation.VERTICAL, StuffOnWater.AIRCRAFT_CARRIER);
+    }
+    @Test
+    public void displayOceanField() throws Exception {
+
+//        Ocean ocean = new Ocean(10, 12);
+//        ocean.setOnOceanAt(0,0, Orientation.VERTICAL, StuffOnWater.AIRCRAFT_CARRIER);
+//        ocean.setOnOceanAt(0,4, Orientation.VERTICAL, StuffOnWater.AIRCRAFT_CARRIER);
+//        ocean.setOnOceanAt(0,8, Orientation.VERTICAL, StuffOnWater.AIRCRAFT_CARRIER);
+//
+//        ocean.setOnOceanAt(2,0, Orientation.VERTICAL, StuffOnWater.AIRCRAFT_CARRIER);
+//        ocean.setOnOceanAt(2,4, Orientation.VERTICAL, StuffOnWater.AIRCRAFT_CARRIER);
+//        ocean.setOnOceanAt(2,8, Orientation.VERTICAL, StuffOnWater.AIRCRAFT_CARRIER);
+//
+//        ocean.setOnOceanAt(4,0, Orientation.VERTICAL, StuffOnWater.AIRCRAFT_CARRIER);
+//        ocean.setOnOceanAt(4,4, Orientation.VERTICAL, StuffOnWater.AIRCRAFT_CARRIER);
+//        ocean.setOnOceanAt(4,8, Orientation.VERTICAL, StuffOnWater.AIRCRAFT_CARRIER);
+//
+//        ocean.setOnOceanAt(6,0, Orientation.VERTICAL, StuffOnWater.AIRCRAFT_CARRIER);
+//        ocean.setOnOceanAt(6,4, Orientation.VERTICAL, StuffOnWater.AIRCRAFT_CARRIER);
+//        ocean.setOnOceanAt(6,8, Orientation.VERTICAL, StuffOnWater.AIRCRAFT_CARRIER);
+//
+//        ocean.setOnOceanAt(8,0, Orientation.VERTICAL, StuffOnWater.AIRCRAFT_CARRIER);
+//        ocean.setOnOceanAt(8,4, Orientation.VERTICAL, StuffOnWater.AIRCRAFT_CARRIER);
+//        ocean.setOnOceanAt(8,8, Orientation.VERTICAL, StuffOnWater.AIRCRAFT_CARRIER);
+//
+//        ocean.setOnOceanAt(1,0, Orientation.VERTICAL, StuffOnWater.AIRCRAFT_CARRIER);
+//        ocean.setOnOceanAt(1,4, Orientation.VERTICAL, StuffOnWater.AIRCRAFT_CARRIER);
+//        ocean.setOnOceanAt(1,8, Orientation.VERTICAL, StuffOnWater.AIRCRAFT_CARRIER);
+//
+//        ocean.setOnOceanAt(3,0, Orientation.VERTICAL, StuffOnWater.AIRCRAFT_CARRIER);
+//        ocean.setOnOceanAt(3,4, Orientation.VERTICAL, StuffOnWater.CRUISER);
+//        ocean.setOnOceanAt(3,7, Orientation.VERTICAL, StuffOnWater.AIRCRAFT_CARRIER);
+//
+//        ocean.setShipWhereThereIsPlace(StuffOnWater.DESTROYER);
     }
 
     @Test
-    public void findSpaceForShip() {
-        Ocean ocean = new Ocean(5);
-        ocean.setOnOceanAt(0, StuffOnWater.DESTROYER);
-        assertEquals(Result.SUCCESS, ocean.setShipWhereThereIsPlace(StuffOnWater.CRUISER), "success");
-        assertEquals(StuffOnWater.CRUISER, ocean.shootAt(2), "Found cuiser");
+    public void setShipsAtRadomPlace() throws Exception {
+//        Ocean ocean = new Ocean(10, 13);
+//        ocean.setShipWhereThereIsPlace(StuffOnWater.AIRCRAFT_CARRIER);
+//        ocean.setShipWhereThereIsPlace(StuffOnWater.AIRCRAFT_CARRIER);
+//        ocean.setShipWhereThereIsPlace(StuffOnWater.CRUISER);
+//        ocean.setShipWhereThereIsPlace(StuffOnWater.CRUISER);
+//        ocean.setShipWhereThereIsPlace(StuffOnWater.DESTROYER);
+//        ocean.setShipWhereThereIsPlace(StuffOnWater.DESTROYER);
+
+        //CommandLineInterface ui = new CommandLineInterface();
+        //ui.showOcean(ocean);
     }
 
+    @Test
+    public void setShipsAtRandomPlaceUntilFindAPlaceOtherwiseThrowAnException() throws Exception {
+//        Ocean ocean = new Ocean(5, 5);
+//        ocean.setShipWhereThereIsPlace(StuffOnWater.AIRCRAFT_CARRIER);
+//        ocean.setShipWhereThereIsPlace(StuffOnWater.AIRCRAFT_CARRIER);
+//        ocean.setShipWhereThereIsPlace(StuffOnWater.CRUISER);
+//        ocean.setShipWhereThereIsPlace(StuffOnWater.CRUISER);
+//        ocean.setShipWhereThereIsPlace(StuffOnWater.DESTROYER);
+//        ocean.setShipWhereThereIsPlace(StuffOnWater.DESTROYER);
+//
+//        CommandLineInterface ui = new CommandLineInterface();
+//        ui.showOceanOpen(ocean);
+    }
 
+    @Test
+    public void shootAtPoint() throws Exception {
+//        Ocean ocean = new Ocean(14, 20);
+//
+//        ocean.setShipWhereThereIsPlace(StuffOnWater.AIRCRAFT_CARRIER);
+//        ocean.setShipWhereThereIsPlace(StuffOnWater.AIRCRAFT_CARRIER);
+//        ocean.setShipWhereThereIsPlace(StuffOnWater.CRUISER);
+//        ocean.setShipWhereThereIsPlace(StuffOnWater.CRUISER);
+//        ocean.setShipWhereThereIsPlace(StuffOnWater.DESTROYER);
+//        ocean.setShipWhereThereIsPlace(StuffOnWater.DESTROYER);
+//
+//        System.out.println(ocean.shootAt(3, 4));
+//        System.out.println(ocean.showShotsMade());
+//
+//        System.out.println(ocean.shootAt(1, 1));
+//        System.out.println(ocean.showShotsMade());
+//
+//        System.out.println(ocean.shootAt(2, 1));
+//
+//        System.out.println(ocean.shootAt(4, 3));
+//
+//        System.out.println(ocean.shootAt(4, 5));
+//        System.out.println(ocean.shootAt(4, 3));
+//        System.out.println(ocean.shootAt(5, 11));
+//
+//        System.out.println(ocean.shootAt(9, 19));
+//        System.out.println(ocean.shootAt(13, 16));
+//        System.out.println(ocean.shootAt(13, 17));
+//
+//        System.out.println(ocean.shootAt(12, 16));
+//
+//        System.out.println(ocean.shootAt(3, 16));
+
+        //System.out.println(ocean.getShotMade(1,1));
+        //CommandLineInterface ui = new CommandLineInterface();
+        //ui.showOcean(ocean);
+        //ui.showOceanHidden(ocean);
+    }
+
+    @Test
+    public void shotAllShipsDown() throws Exception {
+//        Ocean ocean = new Ocean(10, 10);
+//        ocean.setOnOceanAt(0,0, Orientation.HORIZONTAL, StuffOnWater.AIRCRAFT_CARRIER);
+//
+//        System.out.println(ocean.howManyTargetsHit());
+//
+//        System.out.println(ocean.shootAt(0,0));
+//        System.out.println(ocean.howManyTargetsHit());
+//
+//        System.out.println(ocean.shootAt(1,0));
+//        System.out.println(ocean.howManyTargetsHit());
+//
+//        System.out.println(ocean.shootAt(9,9));
+//        System.out.println(ocean.howManyTargetsHit());
+//
+//        System.out.println(ocean.shootAt(2,0));
+//        System.out.println(ocean.howManyTargetsHit());
+//
+//        System.out.println(ocean.shootAt(3,0));
+//        System.out.println(ocean.howManyTargetsHit());
+//        System.out.println(ocean.shootAt(4,0));
+//        System.out.println(ocean.howManyTargetsHit());
+//        CommandLineInterface ui = new CommandLineInterface();
+//        ui.showOcean(ocean);
+    }
 }

@@ -1,3 +1,5 @@
 .idea
 out
 23_battleShip.iml
+src/test
+*.log

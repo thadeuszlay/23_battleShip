@@ -1,66 +1,95 @@
 package main.model;
 
+import main.controller.FindFreePosition;
+import main.controller.RandomCoordinate;
+import java.awt.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 /**
  * Created by think on 17.05.17.
  */
 public class Ocean {
-    int length;
-    StuffOnWater[] ocean;
-    public Ocean(int length) {
-        ocean = new StuffOnWater[length];
-        for (int i = 0; i < ocean.length; i++) {
-            ocean[i] = StuffOnWater.WATER;
+    StuffOnWater[][] ocean;
+    Map<Point, StuffOnWater> shotsMade = new HashMap<>();
+    Set<Point> shipsPlaced = new HashSet<>();
+    RandomCoordinate randomCoordinate;
+    FindFreePosition findFreePosition;
+
+    public Ocean(int xLength, int yLength) throws Exception {
+        if (xLength < 5) throw new Exception("X length must be larger than or equal to 6");
+        if (yLength < 5) throw new Exception("Y length must be larger than or equal to 6");
+
+        ocean = new StuffOnWater[yLength][xLength];
+        for (int y = 0; y < ocean.length; y++) {
+            for (int x = 0; x < ocean[0].length; x++) {
+                ocean[y][x] = StuffOnWater.WATER;
+            }
         }
+        randomCoordinate = new RandomCoordinate(ocean[0].length, ocean.length);
+        findFreePosition = new FindFreePosition(this);
+
     }
-    public StuffOnWater shootAt(int x) {
-        return ocean[x];
+    public int getXLength() {return ocean[0].length;}
+    public int getYLength() {return ocean.length;}
+
+    public StuffOnWater getLocationStatusAt(int x, int y) {return ocean[y][x];}
+
+    public StuffOnWater shootAt(int x, int y) throws Exception {
+        if (x > getXLength()) throw new Exception("X is out of scope");
+        if (x > getYLength()) throw new Exception("Y is out of scope");
+        shotsMade.put(new Point(x,y), getLocationStatusAt(x,y));
+        shipsPlaced.remove(new Point(x,y));
+        return getLocationStatusAt(x,y);
     }
 
-    public Result setShipWhereThereIsPlace(StuffOnWater ship) {
-        int position = findFreePosition(ship);
-        if (position != -1){
-            setOnOceanAt(position, ship);
+    public int howManyTargetsHit() {return shipsPlaced.size();}
+
+    public StuffOnWater getShotMade(int x, int y) {return shotsMade.get(new Point(x,y));}
+
+    public Result setShipWhereThereIsPlace(StuffOnWater ship) throws Exception {
+        int[] position = findFreePosition.getPosition(ship);
+        Orientation orientation = position[2] == 0 ? Orientation.HORIZONTAL : Orientation.VERTICAL;
+        if (position[0] != -1){
+            setOnOceanAt(position[0], position[1], orientation, ship);
             return Result.SUCCESS;
         }
+        System.out.println("Failed! " + position[0] + " " + position[1] + " " + position[2] + " " + ship);
         return Result.FAILED;
     }
 
-    public void setOnOceanAt(int x, StuffOnWater ship) {
+    public void setOnOceanAt(int x, int y, Orientation orientation, StuffOnWater ship) {
+        if (orientation == Orientation.HORIZONTAL){
+            setOnOceanHorizontally(x,y,ship);
+        } else {
+            setOnOceanVertically(x,y,ship);
+        }
+    }
+
+    private void setOnOceanHorizontally(int x, int y, StuffOnWater ship) {
         for (int i = 0; i < ship.getShipLength(); i++) {
-            ocean[x + i] = ship;
-        }
-    }
-
-    public int findFreePosition(StuffOnWater shipType) {
-        int start = 0, i = 0, k = 0;
-
-        while (i < ocean.length) {
-            if (k == 0) start = i;
-            if (ocean[i] == StuffOnWater.WATER) k++;
-            if (k == shipType.getShipLength()) return start;
-            if (ocean[i] != StuffOnWater.WATER && k < shipType.getShipLength()) {
-                k = 0;
-                start = -1;
+            int xCoordinate = x + i, yCoordinate = y;
+            try {
+                ocean[yCoordinate][xCoordinate] = ship;
+            } catch(Exception e) {
+                e.getCause();
             }
-            if (i == ocean.length -1 && k < shipType.getShipLength()) start = -1;
-            i++;
+            shipsPlaced.add(new Point(xCoordinate,yCoordinate));
         }
-        return start;
     }
 
-    public void putDestroyer(int x) {
-        putShipAt(x, StuffOnWater.DESTROYER);
-    }
-    public void putCruiser(int x) {
-        putShipAt(x, StuffOnWater.CRUISER);
-    }
-    public void putAircraftCarrier(int x) {
-        putShipAt(x, StuffOnWater.AIRCRAFT_CARRIER);
-    }
+    private void setOnOceanVertically(int x, int y, StuffOnWater ship) {
+        for (int i = 0; i < ship.getShipLength(); i++) {
+            int xCoordinate = x, yCoordinate = y + i;
 
-    private void putShipAt(int x, StuffOnWater shipType) {
-        for (int i = 0; i < shipType.getShipLength(); i++) {
-            ocean[x + i] = shipType;
+            try {
+                ocean[yCoordinate][xCoordinate] = ship;
+            } catch(Exception e) {
+                e.getCause();
+            }
+            shipsPlaced.add(new Point(xCoordinate, yCoordinate));
         }
     }
 }
