@@ -1,8 +1,5 @@
 package main.controller;
 
-import main.model.Ocean;
-import main.model.StuffOnWater;
-
 import java.awt.*;
 
 /**
@@ -16,18 +13,14 @@ public class RandomCoordinate {
         this.xLength = xLength;
         this.yLength = yLength;
     }
-    private int getRandomHorizontalXPosition(int shipLength) {
-        return (int)Math.floor(Math.random() * (xLength - shipLength));
-    }
+    private int getRandomHorizontalXPosition(int shipLength) { return (int)Math.floor(Math.random() * (xLength - shipLength));}
     private int getRandomHorizontalYPosition() {
         return (int)Math.floor(Math.random() * yLength);
     }
     private int getRandomVerticalXPosition() {
         return (int)Math.floor(Math.random() * xLength);
     }
-    private int getRandomVerticalYPosition(int shipLength) {
-        return (int)Math.floor(Math.random() * (yLength - shipLength));
-    }
+    private int getRandomVerticalYPosition(int shipLength) {return (int)Math.floor(Math.random() * (yLength - shipLength));}
     public Point getRandomHorizontalCoordinate(int shipLength) {
         return new Point(getRandomHorizontalXPosition(shipLength), getRandomHorizontalYPosition());
     }

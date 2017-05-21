@@ -1,6 +1,7 @@
 package main.controller;
 
 import main.model.Ocean;
+import main.model.OceanImpl;
 import main.model.StuffOnWater;
 
 import java.awt.*;
@@ -61,7 +62,7 @@ public class FindFreePosition {
         return start;
     }
 
-    public int[] findFreePositionHorizontally(int shipLength, int xOffset, int yOffset) throws Exception {
+    private int[] findFreePositionHorizontally(int shipLength, int xOffset, int yOffset) throws Exception {
         int x = xOffset, y = yOffset, k = 0, yIteration = 0;;
         int[] start = {0,0, 0};
 

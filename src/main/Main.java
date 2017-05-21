@@ -1,7 +1,7 @@
 package main;
 
 import main.controller.Game;
-import main.model.Ocean;
+import main.model.OceanImpl;
 import main.model.StuffOnWater;
 
 /**
@@ -9,7 +9,7 @@ import main.model.StuffOnWater;
  */
 public class Main {
     public static void main(String[] args) throws Exception {
-        Ocean ocean = new Ocean(5, 5);
+        OceanImpl ocean = new OceanImpl(5, 5);
 
         ocean.setShipWhereThereIsPlace(StuffOnWater.AIRCRAFT_CARRIER);
         ocean.setShipWhereThereIsPlace(StuffOnWater.AIRCRAFT_CARRIER);
