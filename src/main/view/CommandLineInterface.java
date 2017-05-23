@@ -1,26 +1,40 @@
 package main.view;
 
-import main.controller.DrawShip;
-import main.controller.DrawShipImpl;
+import main.controller.DrawMaritime;
+import main.controller.DrawMaritimeImpl;
+import main.model.MaritimeElement;
 import main.model.Ocean;
-import main.model.StuffOnWater;
 
 /**
  * Created by think on 18.05.17.
  */
 public class CommandLineInterface implements UserInterface{
-    DrawShip drawShip = new DrawShipImpl();
 
+    DrawMaritime drawMaritime = new DrawMaritimeImpl();
+    @Override
+    public void display(String message) {
+        System.out.println(message);
+    }
+    @Override
+    public void displayFeedbackWin() {
+        display("You won!");
+    }
+    @Override
+    public void displayFeedbackShotMissed() {
+        display("Missed");
+    }
+    @Override
+    public void displayFeedbackShotHit() {
+        display("Hit");
+    }
     @Override
     public void showOceanOpen(Ocean ocean) {
         genericDrawOcean(ocean, drawShipsOpenly);
     }
-
     @Override
     public void showOcean(Ocean ocean) {
         genericDrawOcean(ocean, drawAllShips);
     }
-
     @Override
     public void showOceanHidden(Ocean ocean) {
         genericDrawOcean(ocean, drawShotsMade);
@@ -48,46 +62,46 @@ public class CommandLineInterface implements UserInterface{
     }
 
     DrawStuffOnOcean drawShipsOpenly = (Ocean ocean, int y, int x) -> {
-        StuffOnWater element = ocean.getLocationStatusAt(x,y);
-        if(element == StuffOnWater.WATER) {
-            System.out.print("~\t");
-        } else if (element == StuffOnWater.DESTROYER) {
-            drawShip.destroyer();
-        } else if (element == StuffOnWater.CRUISER) {
-            drawShip.cruiser();
-        } else if (element == StuffOnWater.AIRCRAFT_CARRIER) {
-            drawShip.showAircraftCarrier();
+        MaritimeElement element = ocean.getLocationStatusAt(x,y);
+        if(element == MaritimeElement.WATER) {
+            drawMaritime.water();
+        } else if (element == MaritimeElement.DESTROYER) {
+            drawMaritime.destroyer();
+        } else if (element == MaritimeElement.CRUISER) {
+            drawMaritime.cruiser();
+        } else if (element == MaritimeElement.AIRCRAFT_CARRIER) {
+            drawMaritime.aircraftCarrier();
         }
     };
 
     DrawStuffOnOcean drawAllShips = (Ocean ocean, int y, int x) -> {
-        StuffOnWater element = ocean.getLocationStatusAt(x,y);
-        StuffOnWater checkForShotsMade = ocean.getShotMade(x,y);
+        MaritimeElement element = ocean.getLocationStatusAt(x,y);
+        MaritimeElement checkForShotsMade = ocean.getShotMade(x,y);
         if (checkForShotsMade == null) {
-            System.out.print("~\t");
+            drawMaritime.water();
         } else {
-            if(element == StuffOnWater.WATER) {
-                System.out.print("X\t");
-            } else if (element == StuffOnWater.DESTROYER) {
-                drawShip.destroyer();
-            } else if (element == StuffOnWater.CRUISER) {
-                drawShip.cruiser();
-            } else if (element == StuffOnWater.AIRCRAFT_CARRIER) {
-                drawShip.showAircraftCarrier();
+            if(element == MaritimeElement.WATER) {
+                drawMaritime.missShip();
+            } else if (element == MaritimeElement.DESTROYER) {
+                drawMaritime.destroyer();
+            } else if (element == MaritimeElement.CRUISER) {
+                drawMaritime.cruiser();
+            } else if (element == MaritimeElement.AIRCRAFT_CARRIER) {
+                drawMaritime.aircraftCarrier();
             }
         }
     };
 
     DrawStuffOnOcean drawShotsMade = (Ocean ocean, int y, int x) -> {
-        StuffOnWater element;
+        MaritimeElement element;
         if (ocean.getShotMade(x,y) == null) {
-            System.out.print("~\t");
+            drawMaritime.water();
         } else {
             element = ocean.getShotMade(x,y);
-            if(element == StuffOnWater.WATER) {
-                System.out.print("X\t");
+            if(element == MaritimeElement.WATER) {
+                drawMaritime.missShip();
             } else {
-                System.out.print("O\t");
+                drawMaritime.hitShip();
             }
         }
     };

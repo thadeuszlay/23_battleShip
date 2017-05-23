@@ -1,7 +1,9 @@
 package main.controller;
 
+import main.controller.assertion.AssertionMaritime;
+import main.model.MaritimeElement;
 import main.model.Ocean;
-import main.model.StuffOnWater;
+import main.model.Orientation;
 
 import java.awt.*;
 
@@ -10,45 +12,43 @@ import java.awt.*;
  */
 public class FindFreePosition {
     Ocean ocean;
-    RandomCoordinate randomCoordinate;
-
-    public FindFreePosition(Ocean ocean) {
+    RandomCoordinateFactory randomPoint;
+    AssertionMaritime assertShip;
+    public FindFreePosition(Ocean ocean, AssertionMaritime assertShip) {
         this.ocean = ocean;
-        randomCoordinate = new RandomCoordinate(ocean.getXLength(), ocean.getYLength());
+        this.assertShip = assertShip;
+        randomPoint = new RandomCoordinateFactory(ocean.getXLength(), ocean.getYLength());
     }
 
-    public int[] getPosition(StuffOnWater shipType) throws Exception {
-        Point randomPointHorizontal = randomCoordinate.getRandomHorizontalCoordinate(shipType.getShipLength());
-        Point randomPointVertical = randomCoordinate.getRandomVerticalCoordinate(shipType.getShipLength());
+    public int[] getPosition(int shipLength) throws Exception {
+        int[][] startingPoints = findFreePositionsHorizontallyAndVertically(shipLength);
+        int selectRandomly = (int)(Math.random() * startingPoints.length);
+        if (startingPoints[selectRandomly][0] != -1) return startingPoints[selectRandomly];
 
-        if((int)(Math.random() * 2) == 1) {
-            int[] coord = findFreePositionHorizontally(shipType.getShipLength(), randomPointHorizontal.x, randomPointHorizontal.y);
-            if (coord[0] != -1) return coord;
-            coord = findFreePositionVertically(shipType.getShipLength(), randomPointVertical.x, randomPointVertical.y);
-            if (coord[0] != -1) return coord;
-            throw new Exception("1 No space for ships found");
-        } else {
-            int[] coord = findFreePositionVertically(shipType.getShipLength(), randomPointVertical.x, randomPointVertical.y);
-            if (coord[0] != -1) return coord;
-            coord = findFreePositionHorizontally(shipType.getShipLength(), randomPointHorizontal.x, randomPointHorizontal.y);
-            if (coord[0] != -1) return coord;
-            throw new Exception("2 No space for ships found");
-        }
+        throw new Exception("No space for ships found");
+    }
+    private int[][] findFreePositionsHorizontallyAndVertically(int shipLength) throws Exception {
+        Point startPointHorizontalShip = randomPoint.getStartPointForHorizontalShip(shipLength);
+        Point startPointVerticalShip = randomPoint.getStartPointForVerticalShip(shipLength);
+        int[] coordHorizontal = findFreePositionHorizontally(shipLength, startPointHorizontalShip.x, startPointHorizontalShip.y);
+        int[] coordVertical = findFreePositionVertically(shipLength, startPointVerticalShip.x, startPointVerticalShip.y);
+
+        return new int[][]{coordHorizontal, coordVertical};
     }
 
     private int[] findFreePositionVertically(int shipLength, int xOffset, int yOffset) throws Exception {
         int x = xOffset,y = yOffset, k = 0, xIteration = 0;
-        int[] start = {0,0,1};
+        int[] start = {-1,-1,Orientation.VERTICAL.getValue()};
 
         while (x < ocean.getXLength() && xIteration < 2) {
             while (y < ocean.getYLength()) {
-                if (k == 0) start = new int[]{x, y, 1};
-                if (ocean.getLocationStatusAt(x,y) == StuffOnWater.WATER) k++;
+                MaritimeElement currentMaritimeElement = ocean.getLocationStatusAt(x,y);
+                if (k == 0) start = new int[]{x, y, Orientation.VERTICAL.getValue()};
+                if (assertShip.isWater(currentMaritimeElement)) k++;
                 if (k == shipLength) return start;
-                if ((ocean.getLocationStatusAt(x,y) != StuffOnWater.WATER && k < shipLength) ||
-                    (y == ocean.getYLength() - 1 && k < shipLength)) {
+                if (assertShip.isSpaceAvailable(currentMaritimeElement, ocean.getYLength(), shipLength, y, k)) {
                     k = 0;
-                    start = new int[]{-1, -1, 1};
+                    start = new int[]{-1, -1, Orientation.VERTICAL.getValue()};
                 }
                 y++;
             }
@@ -63,17 +63,17 @@ public class FindFreePosition {
 
     private int[] findFreePositionHorizontally(int shipLength, int xOffset, int yOffset) throws Exception {
         int x = xOffset, y = yOffset, k = 0, yIteration = 0;;
-        int[] start = {0,0, 0};
+        int[] start = {-1,-1, Orientation.HORIZONTAL.getValue()};
 
         while (y < ocean.getYLength() && yIteration < 2) {
             while (x < ocean.getXLength()) {
-                if (k == 0) start = new int[]{x, y, 0};
-                if (ocean.getLocationStatusAt(x,y) == StuffOnWater.WATER) k++;
+                MaritimeElement currentMaritimeElement = ocean.getLocationStatusAt(x,y);
+                if (k == 0) start = new int[]{x, y, Orientation.HORIZONTAL.getValue()};
+                if (assertShip.isWater(currentMaritimeElement)) k++;
                 if (k == shipLength) return start;
-                if ((ocean.getLocationStatusAt(x,y) != StuffOnWater.WATER && k < shipLength) ||
-                    (x == ocean.getXLength() - 1 && k < shipLength)) {
+                if (assertShip.isSpaceAvailable(currentMaritimeElement, ocean.getXLength(), shipLength, x, k)) {
                     k = 0;
-                    start = new int[]{-1, -1, 0};
+                    start = new int[]{-1, -1, Orientation.HORIZONTAL.getValue()};
                 }
                 x++;
             }

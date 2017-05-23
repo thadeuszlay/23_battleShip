@@ -1,5 +1,7 @@
 package main.controller.utils;
 
+import main.model.MaritimeElement;
+
 import java.util.Scanner;
 
 /**
@@ -10,8 +12,8 @@ public class Helper {
         Scanner scanner = new Scanner(System.in);
         return scanner.nextLine();
     }
-    public static int[] getValidUserInput(int maxX, int maxY) {
-        int x = 0, y = 0;
+    public static int[] getIntegerUserInputInRange(int maxX, int maxY) {
+        int x = -1, y = -1;
         do {
             String userInput = getUserInput();
             String[] userInputString = userInput.split(" ");
@@ -27,5 +29,14 @@ public class Helper {
             }
         } while(true);
         return new int[]{x, y};
+    }
+    public static MaritimeElement[][] initOcean(int xLength, int yLength) {
+        MaritimeElement[][] ocean = new MaritimeElement[yLength][xLength];
+        for (int y = 0; y < yLength; y++) {
+            for (int x = 0; x < xLength; x++) {
+                ocean[y][x] = MaritimeElement.WATER;
+            }
+        }
+        return ocean;
     }
 }

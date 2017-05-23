@@ -1,22 +1,22 @@
 package main;
 
 import main.controller.Game;
+import main.model.MaritimeElement;
 import main.model.OceanImpl;
-import main.model.StuffOnWater;
 
 /**
  * Created by think on 17.05.17.
  */
 public class Main {
     public static void main(String[] args) throws Exception {
-        OceanImpl ocean = new OceanImpl(5, 5);
+        OceanImpl ocean = new OceanImpl(6, 7);
 
-        ocean.setShipWhereThereIsPlace(StuffOnWater.AIRCRAFT_CARRIER);
-        ocean.setShipWhereThereIsPlace(StuffOnWater.AIRCRAFT_CARRIER);
-        ocean.setShipWhereThereIsPlace(StuffOnWater.CRUISER);
-        ocean.setShipWhereThereIsPlace(StuffOnWater.CRUISER);
-        ocean.setShipWhereThereIsPlace(StuffOnWater.DESTROYER);
-        ocean.setShipWhereThereIsPlace(StuffOnWater.DESTROYER);
+        ocean.setShipWhereThereIsPlace(MaritimeElement.AIRCRAFT_CARRIER);
+        ocean.setShipWhereThereIsPlace(MaritimeElement.AIRCRAFT_CARRIER);
+        ocean.setShipWhereThereIsPlace(MaritimeElement.CRUISER);
+        ocean.setShipWhereThereIsPlace(MaritimeElement.CRUISER);
+        ocean.setShipWhereThereIsPlace(MaritimeElement.DESTROYER);
+        ocean.setShipWhereThereIsPlace(MaritimeElement.DESTROYER);
 
         Game game = new Game(ocean);
         game.start();

@@ -1,7 +1,10 @@
 package main.model;
 
-import main.controller.FindFreePosition;
-import main.controller.RandomCoordinate;
+import main.controller.*;
+import main.controller.assertion.AssertionMaritime;
+import main.controller.assertion.AssertionMaritimeImpl;
+import main.controller.utils.Helper;
+
 import java.awt.*;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,37 +15,36 @@ import java.util.Set;
  * Created by think on 17.05.17.
  */
 public class OceanImpl implements Ocean{
-    StuffOnWater[][] ocean;
-    Map<Point, StuffOnWater> shotsMade = new HashMap<>();
+    MaritimeElement[][] ocean;
+    Map<Point, MaritimeElement> shotsMade = new HashMap<>();
     Set<Point> shipsPlaced = new HashSet<>();
-    RandomCoordinate randomCoordinate;
+    RandomCoordinateFactory randomCoordinateFactory;
     FindFreePosition findFreePosition;
+    AssertionMaritime assertShip = new AssertionMaritimeImpl();
+    SetOnOcean setOnOceanHorizontally;
+    SetOnOcean setOnOceanVertically;
+    SetOnOcean[] setOnOcean;
 
     public OceanImpl(int xLength, int yLength) throws Exception {
-        if (xLength < 5) throw new Exception("X length must be larger than or equal to 6");
-        if (yLength < 5) throw new Exception("Y length must be larger than or equal to 6");
+        assertShip.isLargerThanMinimumDimension(xLength, yLength);
+        ocean = Helper.initOcean(yLength, xLength);
 
-        ocean = new StuffOnWater[yLength][xLength];
-        for (int y = 0; y < ocean.length; y++) {
-            for (int x = 0; x < ocean[0].length; x++) {
-                ocean[y][x] = StuffOnWater.WATER;
-            }
-        }
-        randomCoordinate = new RandomCoordinate(ocean[0].length, ocean.length);
-        findFreePosition = new FindFreePosition(this);
+        randomCoordinateFactory = new RandomCoordinateFactory(ocean[0].length, ocean.length);
+        findFreePosition = new FindFreePosition(this, assertShip);
+        setOnOceanHorizontally = new SetOnOceanHorizontally(this);
+        setOnOceanVertically = new SetOnOceanVertically(this);
+        setOnOcean = new SetOnOcean[]{setOnOceanHorizontally, setOnOceanVertically};
     }
-
     @Override
     public int getXLength() {return ocean[0].length;}
     @Override
     public int getYLength() {return ocean.length;}
     @Override
-    public StuffOnWater getLocationStatusAt(int x, int y) {return ocean[y][x];}
-
+    public MaritimeElement getLocationStatusAt(int x, int y) {return ocean[y][x];}
     @Override
-    public StuffOnWater shootAt(int x, int y) throws Exception {
-        if (x > getXLength()) throw new Exception("X is out of scope");
-        if (x > getYLength()) throw new Exception("Y is out of scope");
+    public MaritimeElement shootAt(int[] userInput) throws Exception {
+        int x = userInput[0], y = userInput[1];
+        assertShip.isPointWithinRange(x,y, this.getXLength(), this.getYLength());
         shotsMade.put(new Point(x,y), getLocationStatusAt(x,y));
         shipsPlaced.remove(new Point(x,y));
         return getLocationStatusAt(x,y);
@@ -50,49 +52,27 @@ public class OceanImpl implements Ocean{
     @Override
     public int howManyTargetsHit() {return shipsPlaced.size();}
     @Override
-    public StuffOnWater getShotMade(int x, int y) {return shotsMade.get(new Point(x,y));}
+    public MaritimeElement getShotMade(int x, int y) {return shotsMade.get(new Point(x,y));}
     @Override
-    public Result setShipWhereThereIsPlace(StuffOnWater ship) throws Exception {
-        int[] position = findFreePosition.getPosition(ship);
-        Orientation orientation = position[2] == 0 ? Orientation.HORIZONTAL : Orientation.VERTICAL;
-        if (position[0] != -1){
-            setOnOceanAt(position[0], position[1], orientation, ship);
+    public Result setShipWhereThereIsPlace(MaritimeElement ship) throws Exception {
+        int[] position = findFreePosition.getPosition(ship.val());
+        if (position[Coordinate.X.val()] != -1){
+            setOnOcean[position[Coordinate.ORIENTATION.val()]]
+                .setShip(position[Coordinate.X.val()],position[Coordinate.Y.val()],ship);
             return Result.SUCCESS;
         }
-        System.out.println("Failed! " + position[0] + " " + position[1] + " " + position[2] + " " + ship);
         return Result.FAILED;
     }
-
-    private void setOnOceanAt(int x, int y, Orientation orientation, StuffOnWater ship) {
-        if (orientation == Orientation.HORIZONTAL){
-            setOnOceanHorizontally(x,y,ship);
-        } else {
-            setOnOceanVertically(x,y,ship);
+    @Override
+    public void setMaritime(int x, int y, MaritimeElement ship) {
+        try {
+            ocean[y][x] = ship;
+        } catch(Exception e) {
+            e.getCause();
         }
     }
-
-    private void setOnOceanHorizontally(int x, int y, StuffOnWater ship) {
-        for (int i = 0; i < ship.getShipLength(); i++) {
-            int xCoordinate = x + i, yCoordinate = y;
-            try {
-                ocean[yCoordinate][xCoordinate] = ship;
-            } catch(Exception e) {
-                e.getCause();
-            }
-            shipsPlaced.add(new Point(xCoordinate,yCoordinate));
-        }
-    }
-
-    private void setOnOceanVertically(int x, int y, StuffOnWater ship) {
-        for (int i = 0; i < ship.getShipLength(); i++) {
-            int xCoordinate = x, yCoordinate = y + i;
-
-            try {
-                ocean[yCoordinate][xCoordinate] = ship;
-            } catch(Exception e) {
-                e.getCause();
-            }
-            shipsPlaced.add(new Point(xCoordinate, yCoordinate));
-        }
+    @Override
+    public void setShipsPlaced(int x, int y) {
+        shipsPlaced.add(new Point(x, y));
     }
 }
